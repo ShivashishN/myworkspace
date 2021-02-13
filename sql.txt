@@ -1,0 +1,386 @@
+http://www.csee.umbc.edu/portal/help/oracle8/server.815/a67842/01_oview.htm
+
+
+
+SQL> startup nomount pfile='/u01/app/oracle/oradata/demo11g/pfile/initdemo11g.ora'
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+SQL> create spfile from pfile='/u01/app/oracle/oradata/demo11g/pfile/initdemo11g.ora';
+
+File created.
+
+SQL> shutdown
+ORA-01507: database not mounted
+
+
+ORACLE instance shut down.
+SQL> startup nomount
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+SQL> set echo on
+SQL> @createdb.sql
+SQL> create database demo11g
+  2  logfile
+  3  group 1('/u01/app/oracle/oradata/demo11g/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo11g/redolog/log02.log') size 50m
+  4  datafile '/u01/app/oracle/oradata/demo11g/datafile/system01.dbf' size 500m
+  5  sysaux datafile '/u01/app/oracle/oradata/demo11g/datafile/sysaux01.dbf' size 300m
+  6  undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo11g/datafile/oradata01.dbf' size 300m
+  7  default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo11g/datafile/temp01.dbf' size 300m
+  8  ;
+
+
+Database created.
+
+SQL> SQL> 
+SQL> 
+
+
+
+
+
+
+
+db_name=demo11g
+instance_name=demo11g
+service_names=demo11g
+control_files='/u01/app/oracle/oradata/demo11g/control/control01.ctl'
+memory_target=500m
+undo_tablespace=undotbs01
+diagnostic_dest=/u01/app/oracle
+
+
+
+
+create database demo11g
+logfile
+group 1('/u01/app/oracle/oradata/demo11g/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo11g/redolog/log02.log') size 50m
+datafile '/u01/app/oracle/oradata/demo11g/datafile/system01.dbf' size 500m
+sysaux datafile '/u01/app/oracle/oradata/demo11g/datafile/sysaux01.dbf' size 300m
+undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo11g/datafile/oradata01.dbf' size 300m
+default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo11g/datafile/temp01.dbf' size 300m
+
+
+==============================================================
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+Database opened.
+
+SQL> shutdown
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup nomount
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+
+SQL> alter database mount
+  2  ;
+
+Database altered.
+
+SQL> alter database open;
+
+Database altered.
+
+SQL> alter database close;
+
+Database altered.
+
+SQL> alter database dismount;
+
+Database altered.
+SQL> shutdown;
+ORA-01507: database not mounted
+
+
+ORACLE instance shut down.
+
+
+SQL> alter database open;
+
+Database altered.
+
+SQL> shutdown;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup mount;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+SQL> startup;
+ORA-01081: cannot start already-running ORACLE - shut it down first
+SQL> startup force;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+Database opened.
+
+
+SQL> startup open read only;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+Database opened.
+SQL> create table abc(x number);   
+create table abc(x number)
+*
+ERROR at line 1:
+ORA-00604: error occurred at recursive SQL level 1
+ORA-16000: database open for read-only access
+
+SQL> create user scott identified by tiger;
+
+User created.
+
+SQL> grant connect to scott;
+
+Grant succeeded.
+
+SQL> grant resource to scott;
+
+Grant succeeded.
+
+--------------------------------------------------------------------------------
+
+[oracle@demo1 ~]$ sqlplus scott/tiger
+bash: sqlplus: command not found
+[oracle@demo1 ~]$ . oraenv
+ORACLE_SID = [oracle] ? demo
+The Oracle base has been set to /u01/app/oracle
+[oracle@demo1 ~]$ sqlplus scott/tiger;
+
+SQL*Plus: Release 11.2.0.4.0 Production on Sun Feb 14 05:55:57 2016
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+ERROR:
+ORA-00942: table or view does not exist
+
+
+Error accessing PRODUCT_USER_PROFILE
+Warning:  Product user profile information not loaded!
+You may need to run PUPBLD.SQL as SYSTEM
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+
+[oracle@demo1 ~]$ sqlplus scott/tiger
+bash: sqlplus: command not found
+[oracle@demo1 ~]$ . oraenv
+ORACLE_SID = [oracle] ? demo
+The Oracle base has been set to /u01/app/oracle
+[oracle@demo1 ~]$ sqlplus scott/tiger;
+
+SQL*Plus: Release 11.2.0.4.0 Production on Sun Feb 14 05:55:57 2016
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+ERROR:
+ORA-00942: table or view does not exist
+
+
+Error accessing PRODUCT_USER_PROFILE
+Warning:  Product user profile information not loaded!
+You may need to run PUPBLD.SQL as SYSTEM
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> create table demo(abc varchar2(20));
+create table demo(abc varchar2(20))
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+
+SQL> create table demo(abc varchar2(20));
+
+Table created.
+
+
+SQL> shutdown immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup restrict;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+Database opened.
+
+SQL> grant restricted session to scott;
+
+Grant succeeded.
+
+SQL> alter system disable restricted session;
+
+System altered.
+
+SQL>alter system enable restricted session;
+
+SQL> startup nomount;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+SQL> set pages 132 lines 132;
+SQL> select * from v$instance;
+
+INSTANCE_NUMBER INSTANCE_NAME	 HOST_NAME							  VERSION	    STARTUP_T
+--------------- ---------------- ---------------------------------------------------------------- ----------------- ---------
+STATUS	     PAR    THREAD# ARCHIVE LOG_SWITCH_WAIT LOGINS     SHU DATABASE_STATUS   INSTANCE_ROLE	ACTIVE_ST BLO
+------------ --- ---------- ------- --------------- ---------- --- ----------------- ------------------ --------- ---
+	      1 demo		 demo1.radical.com						  11.2.0.4.0	    14-FEB-16
+STARTED      NO 	  0 STOPPED		    ALLOWED    NO  ACTIVE	     UNKNOWN		NORMAL	  NO
+
+
+SQL> select * from v$database;
+select * from v$database
+              *
+ERROR at line 1:
+ORA-01507: database not mounted
+
+
+SQL> alter database mount;
+
+Database altered.
+
+
+===============================
+
+SQL> select * from v$controlfile;
+
+STATUS
+-------
+NAME
+------------------------------------------------------------------------------------------------------------------------------------
+IS_ BLOCK_SIZE FILE_SIZE_BLKS
+--- ---------- --------------
+
+/u01/app/oracle/oradata/demo/control/control01.ctl
+NO	 16384		  478
+
+
+SQL> alter system set control_files=('/u01/app/oracle/oradata/demo/control/control01.ctl','/u01/app/oracle/oradata/demo/control/control02.ctl') scope=spfile;
+alter system set control_files=('/u01/app/oracle/oradata/demo/control/control01.ctl','/u01/app/oracle/oradata/demo/control/control02.ctl') scope=spfile
+                 *
+ERROR at line 1:
+ORA-02095: specified initialization parameter cannot be modified
+
+****multiplexing of controlfiles
+
+SQL> alter system set control_files='/u01/app/oracle/oradata/demo/control/control01.ctl','/u01/app/oracle/oradata/demo/control/control02.ctl' scope=spfile;
+
+System altered.
+
+SQL> shutdown;
+ORA-01109: database not open
+
+
+Database dismounted.
+ORACLE instance shut down.
+SQL> 
+
+
+[oracle@demo1 control]$ ls -lrt
+total 7664
+-rw-r----- 1 oracle oinstall 7847936 Feb 14 07:18 control01.ctl
+[oracle@demo1 control]$ cp control01.ctl control02.ctl
+[oracle@demo1 control]$ 
+SQL> alter system set control_files='/u01/app/oracle/oradata/demo/control/control01.ctl','/u01/app/oracle/oradata/demo/control/control02.ctl' scope=spfile;
+
+System altered.
+
+SQL> shutdown;
+ORA-01109: database not open
+
+
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+Database mounted.
+Database opened.
+SQL> select * from v$controlfile;
+
+STATUS
+-------
+NAME
+------------------------------------------------------------------------------------------------------------------------------------
+IS_ BLOCK_SIZE FILE_SIZE_BLKS
+--- ---------- --------------
+
+/u01/app/oracle/oradata/demo/control/control01.ctl
+NO	 16384		  478
+
+
+/u01/app/oracle/oradata/demo/control/control02.ctl
+NO	 16384		  478
+
+
+SQL> 
+
+
+=================================================================14/02/2016================================================================
+
+
+
+
+
+
