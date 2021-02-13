@@ -1,0 +1,73 @@
+[oracle@demo1 radical]$ cd ..
+[oracle@demo1 oradata]$ ls -lrt
+total 8
+drwxr-xr-x 7 oracle oinstall 4096 Feb  8 06:22 demo11g
+drwxr-xr-x 7 oracle oinstall 4096 Feb  8 07:41 radical
+[oracle@demo1 oradata]$ mkdir demo
+[oracle@demo1 oradata]$ cd demo
+[oracle@demo1 demo]$ mkdir pfile datafile control redolog archivelog
+[oracle@demo1 demo]$ cd pfile
+[oracle@demo1 pfile]$ vi initdemo
+[oracle@demo1 pfile]$ vi initdemo.ora
+[oracle@demo1 pfile]$ cd ..
+[oracle@demo1 demo]$ vi createdb.sql
+[oracle@demo1 demo]$ . oraenv
+ORACLE_SID = [oracle] ? demo
+The Oracle base has been set to /u01/app/oracle
+[oracle@demo1 demo]$ sqlplus / as sysdba
+
+SQL*Plus: Release 11.2.0.4.0 Production on Mon Feb 8 11:44:40 2016
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup nomount pfile='/u01/app/oracle/oradata/demo/pfile/initdemo.ora';         
+ORACLE instance started.
+
+Total System Global Area  521936896 bytes
+Fixed Size		    2254824 bytes
+Variable Size		  327157784 bytes
+Database Buffers	  184549376 bytes
+Redo Buffers		    7974912 bytes
+SQL> create spfile from pfile='/u01/app/oracle/oradata/demo/pfile/initdemo.ora';      
+
+File created.
+
+SQL> set echo on;
+SQL> @createdb.sql
+SQL> create database demo
+  2  logfile
+  3  group 1('/u01/app/oracle/oradata/demo/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo/redolog/log02.log') size 50m
+  4  datafile '/u01/app/oracle/oradata/demo/datafile/system01.dbf' size 500m
+  5  sysaux datafile '/u01/app/oracle/oradata/demo/datafile/sysaux01.dbf' size 300m
+  6  undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo/datafile/oradata01.dbf' size 300m
+  7  default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo/datafile/temp01.dbf' size 300m
+  8  
+SQL> @createdb.sql;
+SQL> create database demo
+  2  logfile
+  3  group 1('/u01/app/oracle/oradata/demo/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo/redolog/log02.log') size 50m
+  4  datafile '/u01/app/oracle/oradata/demo/datafile/system01.dbf' size 500m
+  5  sysaux datafile '/u01/app/oracle/oradata/demo/datafile/sysaux01.dbf' size 300m
+  6  undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo/datafile/oradata01.dbf' size 300m
+  7  default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo/datafile/temp01.dbf' size 300m
+  8  
+SQL> ;
+  1  create database demo
+  2  logfile
+  3  group 1('/u01/app/oracle/oradata/demo/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo/redolog/log02.log') size 50m
+  4  datafile '/u01/app/oracle/oradata/demo/datafile/system01.dbf' size 500m
+  5  sysaux datafile '/u01/app/oracle/oradata/demo/datafile/sysaux01.dbf' size 300m
+  6  undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo/datafile/oradata01.dbf' size 300m
+  7* default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo/datafile/temp01.dbf' size 300m
+SQL> @createdb.sql
+SQL> create database demo
+  2  logfile
+  3  group 1('/u01/app/oracle/oradata/demo/redolog/log01.log') size 50m , group 2 ('/u01/app/oracle/oradata/demo/redolog/log02.log') size 50m
+  4  datafile '/u01/app/oracle/oradata/demo/datafile/system01.dbf' size 500m
+  5  sysaux datafile '/u01/app/oracle/oradata/demo/datafile/sysaux01.dbf' size 300m
+  6  undo tablespace undotbs01 datafile '/u01/app/oracle/oradata/demo/datafile/oradata01.dbf' size 300m
+  7  default temporary tablespace temp tempfile '/u01/app/oracle/oradata/demo/datafile/temp01.dbf' size 300m
+  8  ;
+

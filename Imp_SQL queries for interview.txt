@@ -1,0 +1,339 @@
+select * from emp1 e1 where &n=(select count(distinct(sal)) from emp1 e2 where e2.sal>=e1.sal);
+
+select * from (select emp1.*,dense_rank() over(order by sal desc)r from emp1) where r=&n;
+
+====Exists operator====
+select * from dept1 d1 where exists(select * from emp1 e1 where e1.deptno=d1.deptno);
+
+select * from dept1 where deptno in (select deptno from emp1);
+
+select * from emp1 e1 where exists(select * from emp1 e2 where e1.sal=e2.sal and e2.ename='SCOTT');
+
+select * from dept1 d1 where not exists(select * from emp1 e1 where e1.deptno=d1.deptno);
+
+select * from dept1 d1 where  not exists (select * from emp1 e1 where e1.deptno=d1.deptno);
+
+select * from emp1 where sal> any (select sal from emp1 where deptno=10);
+
+select * from emp1 where sal>all(select sal from emp1 where job='CLERK');
+
+select * from emp1 where deptno > all(10,20);
+select distinct(deptno) from emp1 where deptno <>all(10,20);
+
+merge into dept1 d using depts s on (d.deptno=s.deptno) when matched then 
+update set d.dname=s.dname,d.loc=s.loc 
+when not matched then insert (d.deptno,d.dname,d.loc) values(s.deptno,s.dname,s.loc);
+==========================================================================================
+User_views,user_updatable_columns,user_mviews(materialized views)
+
+create or replace view V4 
+as 
+select ename,sal,dname,loc from emp,dept
+where emp.deptno=dept.deptno;
+
+select * from V4;
+
+select text from user_views where view_name='V4';
+
+--Generally we cant perform DML operations through complex views to base table.
+
+update V4 set ename='abc' where ename='SMITH';
+
+update V4 set ename='abc' where ename='SMITH';
+
+update V4 set dname='xyz' where dname='SALES';
+
+desc user_updatable_columns;
+
+==Generally in oracle we cant perform DML operations through complex view so to overcome this in oracle 8.0 we have instead of triggers.
+--in statement level trigger trigger body is executed only once per DML statement.
+--in row level trigger trigger body is executed for each row for DML statemen.
+
+M.View refresh : exec dbms_mview.refresh('mv3');
+create table test1(sno number(10) primary key,name varchar2(10));
+
+insert into test1 values(103,'joy');
+
+create materialized view log on test1;
+
+drop table test1;
+
+create materialized view v9
+refresh fast on demand
+as select * from test1;
+
+select * from v9;
+
+exec dbms_mview.refresh('v9');
+
+=================================================
+two types of privileges: system,object privileges.
+
+1.system privileges given by DBAs only.system privileges are allowed to users to create database objects and also drop database objects.
+oracle having more than 80 system privileges.create session,create table,create any view,create procedure,create trigger,create materialized view etc.
+syntax: grant systemprivileges to username1,username2....
+create system privileges which is used t connect clients(users) to the database.
+
+Role: Role is nothing but collection of either system privileges or collection of object privileges.
+      Two types of roles are :
+                                1.user defined roles.
+                                2.predefined roles.
+
+1.user defined roles : created by DBAs only.
+Step 1: create role rolename;
+step2:  grant system privileges to rolename;
+step3:  grant rolename to user1,user2,user3.....
+In oracle ll system privileges related to role is stored under role_sys_privs.[connect as sys hen desc]
+SQL> create role r1;
+Role created.
+SQL> grant create any materialized view,create trigger,create any view to r1;
+Grant succeeded.
+SQL> grant r1 to scott,murali,newyear;
+Grant succeeded.
+select column_name,updatable from user_updatable_columns where table_name='V4';
+SQL> create role r1;
+Role created.
+SQL> grant create any materialized view,create trigger,create any view to r1;
+Grant succeeded.
+SQL> grant r1 to scott,murali,newyear;
+Grant succeeded.
+SQL> create role r1;
+Role created.
+SQL> grant create any materialized view,create trigger,create any view to r1;
+Grant succeeded.
+SQL> grant r1 to scott,murali,newyear;
+Grant succeeded.
+2: Predefined rles: three predefined roles are connect,resource(developer),dba
+
+2. Object privileges: either given by DBA or database developer.
+SQL> create role r1;
+Role created.
+SQL> grant create any materialized view,create trigger,create any view to r1;
+Grant succeeded.
+SQL> grant r1 to scott,murali,newyear;
+Grant succeeded.
+SQL> show user;
+USER is "A1"
+SQL> conn sys as sysdba;
+Enter password:
+Connected.
+SQL> show user;
+USER is "SYS"
+SQL> alter user a1 quota unlimited on USERS;
+**SEQUENCE: sequence is a database object which is used to generate sequence number automatically.
+used to generate primary key.DBA creates sequences.once sequence is created then number of users can access simultaneously.
+syntax: 
+create sequence sequencename
+starts with n
+increment by n
+minvalue n
+maxvalue n
+cache/nocache
+cycle/nocycle
+
+to genrate and acess sequence value 1.currval 2.nextval
+seqname.currval  seqname.nextval
+pseudo colum is used in insert,update,delete,select.
+
+select seqname.currval from dual;
+user_sequences
+=============================================Locking=========================================
+Locking is a mechanism which prevents unauthrized accessfor our resources.
+1.Row level Locking
+2.Table level locking
+
+Table level locks:
+1.shared lock(read lock)
+2.exclusive lock(write lock)
+
+   S     X
+S  Yes   Yes
+
+X  Yes   No
+
+lock tabl1 table name in mode;
+====================================IMP DD Command in unix=============================
+$dd if=test of=out conv=ucase
+
+========================================================indexes==========================================
+
+Indexe is a database object which is used to retreive data fery fastly from the database.created on tavle columns.
+Indexes are created in two ways:
+1.Automatically
+2.Manually
+1.Automatically: whenever we are creating Primary key or unique key the automatically oracle server creates Btree idexes on those columns.
+2.Manually: we can also create indexes explicitly by using syntax:
+create index indexname on tablename(columnname);
+whenever we are searching data by using where clause or order by clause then only DB server searches for idexes.
+for not equal to,is null or is not null then indexes are not searche.!=,is null and is not null-->no use of index.
+Two types of indexes:
+1.Btree index
+2.Bitmap indexes
+
+1.Btree indexes: in oracle by default indexes are Btree indexes.
+whenever we are creating Btree indexes then oracle server automatically creates Btree based on column values.In this Btree always leaf node stores actual data 
+along with rowid.
+
+user_indexes
+if we want to view colum name along with index name then user_ind_columns
+
+to check if the query is using index or not use explain plan infront of the query.
+
+explain plan for select * from emp1;
+
+select * from table(dbms_xplan.display());
+
+explain plan for select * from emp1 where ename like '%S%';
+
+select * from table(dbms_xplan.display());
+
+Plan hash value: 3704177640
+ 
+------------------------------------------------------------------------------------
+| Id  | Operation                   | Name | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT            |      |     1 |    32 |     2   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID| EMP1 |     1 |    32 |     2   (0)| 00:00:01 |
+|*  2 |   INDEX FULL SCAN           | IN1  |     1 |       |     1   (0)| 00:00:01 |
+------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+==================================================================
+--virtual column: before 11g we used views and function based indexes to stored stored expression but now from 11g we use virtual column
+to store stored values.we use generated always as clause for this
+
+user_tab_columns
+select column_name,data_default from user_tab_columns where table_name='TEST';
+
+oracle have two types of Btree indexes:
+1.Non unique Btree indexes
+2.Unique Btree indexes.
+
+bydefault indexes are unique indexes and manually created indexes are Non Unique Btree indexes.
+we can create unique btree indexes also as : create unique index indexname on tablename(columnname);
+
+create unique index in3 on emp1(ename);
+
+============================BITMAP Indexes=====================================
+
+7.3 introduced bitmap indexes.generally used in datawere housing applications.
+bitmap indexes are created on low cardinality columns.
+cardinality of column=number of distinct value/total number of rows.
+cardinality of empno=14/14=1(high cardinality)-->Btree indexes
+cardinality of Job=5/14=.357(low cardinality)-->Bitmap indexes
+syntax:
+create bitmap index indexname on tablename(columnname);
+
+bitmap table is created based on column values.
+
+results and bitmap is converted into rowid by using internal bitmap function
+
+=====================synonyms===================================
+
+synonym is a database object which provide security.
+synonym is an alias name or reference name for original object.
+generally synonym hides another schema username,object name.
+
+syntax:
+create synonym synonymname for username.objectname;
+
+all database having two types of synonyms:
+1.public synonym
+2.private synonym
+
+by default synonyms are private synonyms.
+private synonym syntax:
+create synonym synonymname for username.objectname@databaselink;
+
+public synonym syntax:
+create public synonym synonymname for username.objectname@databaselink;
+
+**Before creating public synonym DBA gives create public synnym system privilege to user by using following syntax otherwise oracle server returns 
+insufficient privilege error.
+
+syntax:
+grant create public synonym to username;
+
+grant all on emp1 to murali,a1;
+
+user_synonyms
+
+
+========================================================Normalization========================================================
+
+Normalization is a scientific process which used to decomposing a table into no. of tables.This process automatically reduces duplicate data and also automatically 
+avoids insertion,updation,deletion problems.In design phase of SDLC Database designers design logical model of database.only database designers uses normalization
+process by using normal forms.
+Normal forms are: 1-NF,2-NF,3-NF,BCNF,4-NF,5-NF.
+
+1> 1-NF(first normal form): if a table in 1-NF in that table data in each column should be automic and also identifying a key record uniquely by using a key.
+
+Item table not in 1-NF
+
+Item Name  color       price     Tax
+
+Marker   Red,green     20         .2
+
+pen      blue,black    30         .3
+
+
+Table in 1-NF
+
+Item Name       color       price     Tax
+(candidate key)
+Marker           Red           20         .2
+Marker           green         20         .2
+pen              blue          30         .3
+pen              black         30         .3
+
+2-NF: If table is in 1 NF and all non key attribute are fully functionally dependent on candidate key then table is in 2 NF.1NF Deals with atomicity and 2NF deals with 
+relation ship btween key and non key attributes.
+
+=================================================
+pivot(): is used to convert rows into columns and also display aggregate function value in tabular form.
+case statement: also used for decoding values also called as searched case statement.
+syntax:
+select job,deptno,case deptno
+when 10 then 'dept10'
+when 20 then 'dept20'
+else 'others' end from emp1;
+
+case statement introduced at oracle 8 and case conditional statement introduced from 8i
+
+case
+when columncondition1 then statement1,
+when columncondition2 then statement2,
+.
+.
+.
+else statements end;
+
+select ename,sal,nullif(sal,greatest(2000,sal)) from emp1;
+select coalesce(null,null,null,20,30) from dual;
+
+===================================nested table==============================
+table within another table is also called as nested table.user defined type which is also used to store number of data items into single unit.
+user defined data type is created by using type key word.user defined table used to store number of data items into single unit permanently.
+creating nested table:
+1. create an object type
+2.create a nested table type
+3.create a table.
+
+1.create an object type: before creating nested table type then we must create an object type.an object type is a user defined type used to store different data types
+into single unit.
+create or replace type typename as object(attribute datatype(size));
+2.create a nested table type: create a nested table type using object type as follows:
+create or replace type typename as table of objectname;
+3.create a table : create a relational table by using nested table type:
+   create table tablename(col1 datatype(size),col2 datatype(size),.......coln nested tabletype) nested table coln store as anyname;
+
+
+
+
+
+
+
+
+
